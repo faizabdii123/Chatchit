@@ -9,132 +9,134 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <script> tailwind.config = { darkMode: 'class' } </script>
+
     <style>
-        /* LOCK THE PAGE SCROLLING */
+        /* BASE SETTINGS */
         html, body {
-            height: 100%;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-            overflow: hidden; /* Stops the background from moving */
-            background-color: #f3f4f6;
+            height: 100%; width: 100%; margin: 0; padding: 0;
+            overflow: hidden; 
             font-family: 'Plus Jakarta Sans', sans-serif;
-            overscroll-behavior: none; /* Stops iPhone bounce */
+            overscroll-behavior: none;
         }
 
-        /* BACKGROUND ANIMATION */
-        .wallpaper {
+        /* --- WALLPAPER (Replace URL for custom bg) --- */
+        .wallpaper-light {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background: linear-gradient(135deg, #8BC6EC 0%, #9599E2 100%);
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
         }
+        .wallpaper-dark {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            opacity: 0; transition: opacity 0.3s;
+        }
+        html.dark .wallpaper-dark { opacity: 1; }
 
-        /* --- THE LAYOUT LOGIC --- */
-        
-        /* DEFAULT (MOBILE): Sticks to the screen edges */
+        /* APP LAYOUT */
         #app-root {
-            position: fixed; 
-            top: 0; left: 0; right: 0; bottom: 0;
-            display: flex;
-            flex-direction: column;
-            background: #fff;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            display: flex; flex-direction: column;
             z-index: 10;
+            background: rgba(255, 255, 255, 0.90); 
+            backdrop-filter: blur(8px);
+            transition: all 0.3s;
         }
+        html.dark #app-root { background: rgba(15, 23, 42, 0.95); }
 
-        /* PC / TABLET: Floats in the center */
+        /* PC VIEW */
         @media (min-width: 768px) {
             body { display: flex; align-items: center; justify-content: center; }
             #app-root {
-                position: relative;
-                width: 400px;
-                height: 85vh;
-                border-radius: 24px;
-                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-                border: 1px solid rgba(255,255,255,0.5);
-                overflow: hidden;
+                position: relative; width: 400px; height: 85vh;
+                border-radius: 24px; overflow: hidden;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             }
         }
 
-        /* MESSAGES */
+        /* CHAT STYLES */
         .msg-self { background: #3b82f6; color: white; border-bottom-right-radius: 2px; }
-        .msg-other { background: #f3f4f6; color: #1f2937; border-bottom-left-radius: 2px; }
-        
-        /* HIDE SCROLLBAR BUT KEEP SCROLLING */
+        .msg-other { background: #ffffff; color: #1f2937; border-bottom-left-radius: 2px; }
+        html.dark .msg-other { background: #334155; color: #e2e8f0; }
+
+        /* UTILS */
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
         .fade-in { animation: fadeIn 0.2s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* CALL BUTTON PULSE */
+        .pulse-ring { animation: pulse-ring 2s infinite; }
+        @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); } 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
     </style>
 </head>
-<body>
+<body class="bg-gray-100 dark:bg-slate-900">
 
-    <div class="wallpaper"></div>
+    <div class="wallpaper-light"></div>
+    <div class="wallpaper-dark"></div>
 
     <div id="app-root">
         
-        <div class="p-3 bg-white/90 border-b border-gray-100 flex justify-between items-center shrink-0 z-20 backdrop-blur-sm">
+        <div class="p-3 border-b border-gray-200 dark:border-slate-700 flex justify-between items-center shrink-0 z-20">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+                <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white shadow-md">
                     <i class="fas fa-heart"></i>
                 </div>
                 <div>
-                    <h1 class="font-bold text-gray-800 leading-none text-lg">MyAfchat</h1>
-                    <p class="text-[11px] text-green-500 font-bold flex items-center gap-1 mt-0.5">
+                    <h1 class="font-bold text-gray-800 dark:text-white text-lg leading-none">MyAfchat</h1>
+                    <p class="text-[11px] text-green-600 dark:text-green-400 font-bold flex items-center gap-1 mt-0.5">
                         <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Online
                     </p>
                 </div>
             </div>
-            <button onclick="clearChat()" class="w-9 h-9 rounded-full bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition flex items-center justify-center active:scale-90">
-                <i class="fas fa-trash-alt text-xs"></i>
-            </button>
+            
+            <div class="flex gap-3">
+                <button onclick="startCall()" class="w-9 h-9 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center active:scale-90 transition">
+                    <i class="fas fa-phone-alt"></i>
+                </button>
+                <button onclick="toggleTheme()" class="w-9 h-9 rounded-full bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-yellow-400 flex items-center justify-center active:scale-90 transition">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button onclick="clearChat()" class="w-9 h-9 rounded-full bg-red-100 dark:bg-red-900/30 text-red-500 flex items-center justify-center active:scale-90 transition">
+                    <i class="fas fa-trash-alt text-xs"></i>
+                </button>
+            </div>
         </div>
 
-        <div id="login-screen" class="absolute inset-0 z-50 bg-white flex flex-col items-center justify-center p-6">
-            <div class="mb-8 text-center">
-                <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-500 text-2xl animate-bounce">
-                    <i class="fas fa-comment-dots"></i>
-                </div>
-                <h2 class="text-2xl font-bold text-gray-800">Welcome</h2>
-                <p class="text-gray-400 text-sm">Join the chat room</p>
-            </div>
-            
-            <input type="text" id="username" placeholder="Enter your name..." 
-                class="w-full p-4 rounded-xl bg-gray-50 border-2 border-gray-100 outline-none text-center font-bold text-lg mb-4 focus:border-blue-500 focus:bg-white transition-all">
-            
-            <button onclick="login()" 
-                class="w-full py-4 rounded-xl bg-blue-600 text-white font-bold text-lg shadow-lg active:scale-95 transition hover:bg-blue-700">
-                Start Chatting
-            </button>
+        <div id="login-screen" class="absolute inset-0 z-50 bg-white dark:bg-slate-900 flex flex-col items-center justify-center p-6">
+            <div class="mb-6"><i class="fas fa-comment text-4xl text-blue-500 animate-bounce"></i></div>
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">Welcome</h2>
+            <input type="text" id="username" placeholder="Enter name..." 
+                class="w-full p-4 rounded-xl bg-gray-100 border-none outline-none text-center font-bold text-lg mb-4 text-black">
+            <button onclick="login()" class="w-full py-4 rounded-xl bg-blue-600 text-white font-bold text-lg shadow-lg">Start</button>
         </div>
 
-        <div id="chat-feed" class="flex-1 overflow-y-auto p-4 space-y-3 bg-white no-scrollbar scroll-smooth">
-            </div>
+        <div id="chat-feed" class="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar scroll-smooth"></div>
 
-        <div class="p-3 bg-white border-t border-gray-100 shrink-0 pb-safe">
-            <form onsubmit="sendMessage(event)" class="flex gap-2 items-center">
-                <input type="text" id="msg-input" placeholder="Type a message..." autocomplete="off"
-                    class="flex-1 p-3.5 pl-5 rounded-full bg-gray-100 border-none outline-none focus:ring-2 focus:ring-blue-500 transition-all text-gray-700">
+        <div class="p-3 border-t border-gray-200 dark:border-slate-700 shrink-0 pb-safe bg-transparent flex items-center gap-2">
+            
+            <label class="w-10 h-10 rounded-full bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-gray-300 flex items-center justify-center cursor-pointer active:scale-90 transition shrink-0">
+                <i class="fas fa-paperclip"></i>
+                <input type="file" id="img-input" accept="image/*" class="hidden" onchange="handleImageSelect(event)">
+            </label>
+
+            <form onsubmit="sendMessage(event)" class="flex-1 flex gap-2 items-center">
+                <input type="text" id="msg-input" placeholder="Message..." autocomplete="off"
+                    class="flex-1 p-3 pl-4 rounded-full bg-white/80 dark:bg-slate-700/80 border-none outline-none focus:ring-2 focus:ring-blue-500 transition-all text-gray-800 dark:text-white shadow-sm">
                 
-                <button type="submit" 
-                    class="w-12 h-12 rounded-full bg-blue-600 text-white shadow-md flex items-center justify-center hover:bg-blue-700 active:scale-90 transition transform shrink-0">
+                <button type="submit" class="w-11 h-11 rounded-full bg-blue-600 text-white shadow-md flex items-center justify-center active:scale-90 shrink-0">
                     <i class="fas fa-paper-plane text-sm"></i>
                 </button>
             </form>
         </div>
-
     </div>
 
-    <div id="toast" class="fixed top-16 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-5 py-2.5 rounded-full text-xs font-bold opacity-0 transition pointer-events-none z-[60] shadow-xl flex items-center gap-2">
-        <i class="fas fa-check-circle text-green-400"></i>
-        <span id="toast-msg">Success</span>
-    </div>
+    <div id="toast" class="fixed top-20 left-1/2 -translate-x-1/2 bg-black/80 text-white px-5 py-2 rounded-full text-xs font-bold opacity-0 transition pointer-events-none z-[60]"><span id="toast-msg">Success</span></div>
+    <audio id="msg-sound" src="https://assets.mixkit.co/active_storage/sfx/2346/2346-preview.m4a"></audio>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getFirestore, collection, addDoc, query, where, orderBy, onSnapshot, serverTimestamp, getDocs, deleteDoc } 
         from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
-        // CONFIGURATION
         const firebaseConfig = {
             apiKey: "AIzaSyArgYxNInVRfiCaG3X5PYFz8g5PUGrL6T4",
             authDomain: "myafchat.firebaseapp.com",
@@ -148,97 +150,157 @@
         const db = getFirestore(app);
         const currentRoom = "main-chat"; 
         let currentUser = "";
+        let isFirstLoad = true; 
 
-        // INIT
+        window.toggleTheme = function() { document.documentElement.classList.toggle('dark'); }
+
         function initApp() {
             const savedUser = sessionStorage.getItem('myafchat_user');
-            if (savedUser) {
-                currentUser = savedUser;
-                document.getElementById('username').value = savedUser;
-            }
+            if (savedUser) { currentUser = savedUser; document.getElementById('username').value = savedUser; }
         }
         initApp();
 
         window.login = function() {
             const name = document.getElementById('username').value.trim();
-            if (!name) return showToast("Enter your name");
+            if (!name) return showToast("Name required");
             currentUser = name;
             sessionStorage.setItem('myafchat_user', name);
-            // Hide login
-            const loginScreen = document.getElementById('login-screen');
-            loginScreen.classList.add('hidden');
-            loginScreen.style.display = 'none';
+            document.getElementById('login-screen').classList.add('hidden');
             startChatListener();
         };
 
-        window.sendMessage = async function(e) {
+        // --- IMAGE HANDLING (COMPRESSION) ---
+        window.handleImageSelect = function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            showToast("Compressing Image...");
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement("canvas");
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    // Resize to max 600px width
+                    if (width > 600) {
+                        height *= 600 / width;
+                        width = 600;
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext("2d");
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // Convert to base64 (JPEG 70% quality)
+                    const dataUrl = canvas.toDataURL("image/jpeg", 0.7);
+                    sendToDb(null, dataUrl, null);
+                }
+                img.src = event.target.result;
+            }
+            reader.readAsDataURL(file);
+        };
+
+        // --- CALL HANDLING ---
+        window.startCall = function() {
+            const roomID = Math.random().toString(36).substring(7);
+            const callLink = `https://meet.jit.si/myafchat-${roomID}`;
+            sendToDb(null, null, callLink);
+        };
+
+        // --- SEND LOGIC ---
+        window.sendMessage = function(e) {
             e.preventDefault();
             const input = document.getElementById('msg-input');
             const text = input.value.trim();
-            if (!text) return;
-
-            try {
-                await addDoc(collection(db, "messages"), {
-                    text: text,
-                    user: currentUser,
-                    room: currentRoom,
-                    createdAt: serverTimestamp()
-                });
+            if (text) {
+                sendToDb(text, null, null);
                 input.value = "";
                 input.focus();
-            } catch (err) { console.error(err); }
+            }
         };
 
+        async function sendToDb(text, image, call) {
+            try {
+                await addDoc(collection(db, "messages"), { 
+                    text: text, 
+                    image: image,
+                    call: call,
+                    user: currentUser, 
+                    room: currentRoom, 
+                    createdAt: serverTimestamp() 
+                });
+            } catch (err) { console.error(err); }
+        }
+
         window.clearChat = async function() {
-            if(!confirm("Are you sure? This deletes messages for EVERYONE.")) return;
-            showToast("Deleting...");
+            if(!confirm("Clear chat for everyone?")) return;
             const q = query(collection(db, "messages"), where("room", "==", currentRoom));
             const snapshot = await getDocs(q);
             snapshot.forEach(async (doc) => await deleteDoc(doc.ref));
-            showToast("Chat Cleared!");
+            showToast("Chat Cleared");
         };
 
         function startChatListener() {
-            const q = query(
-                collection(db, "messages"),
-                where("room", "==", currentRoom),
-                orderBy("createdAt", "asc")
-            );
-
+            const q = query(collection(db, "messages"), where("room", "==", currentRoom), orderBy("createdAt", "asc"));
             onSnapshot(q, (snapshot) => {
                 const feed = document.getElementById('chat-feed');
                 feed.innerHTML = ''; 
+                if (!isFirstLoad) {
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === "added" && change.doc.data().user !== currentUser) { 
+                            document.getElementById('msg-sound').play().catch(e=>{}); 
+                        }
+                    });
+                } else { isFirstLoad = false; }
 
-                if (snapshot.empty) {
-                     feed.innerHTML = `
-                        <div class="flex flex-col items-center justify-center h-full text-gray-300 opacity-60">
-                            <i class="fas fa-comments text-5xl mb-3"></i>
-                            <p class="text-sm">No messages yet</p>
-                        </div>
-                     `;
-                }
-
-                snapshot.forEach((doc) => {
-                    const msg = doc.data();
-                    renderMessage(msg.user, msg.text, feed);
-                });
-                
-                // Force scroll to bottom
-                setTimeout(() => { feed.scrollTop = feed.scrollHeight; }, 100);
+                if (snapshot.empty) feed.innerHTML = `<div class="text-center text-gray-500 mt-10 text-xs">No messages yet.</div>`;
+                snapshot.forEach((doc) => renderMessage(doc.data(), feed));
+                setTimeout(() => { feed.scrollTop = feed.scrollHeight; }, 50);
             });
         }
 
-        function renderMessage(user, text, container) {
-            const isMe = user === currentUser;
+        function renderMessage(msg, container) {
+            const isMe = msg.user === currentUser;
             const div = document.createElement('div');
-            div.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'} fade-in mb-2`;
+            div.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'} fade-in mb-3`;
+            
+            let timeString = "";
+            if (msg.createdAt) { timeString = msg.createdAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); }
 
-            const safeText = text ? text.replace(/</g, "&lt;") : "";
+            let contentHtml = "";
+
+            // 1. CALL MESSAGE
+            if (msg.call) {
+                contentHtml = `
+                    <div class="flex items-center gap-3">
+                        <div class="bg-green-500 w-10 h-10 rounded-full flex items-center justify-center text-white animate-pulse">
+                            <i class="fas fa-phone-alt"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold">Incoming Call...</p>
+                            <a href="${msg.call}" target="_blank" class="text-xs bg-black text-white px-3 py-1 rounded-full mt-1 inline-block">JOIN NOW</a>
+                        </div>
+                    </div>
+                `;
+            } 
+            // 2. IMAGE MESSAGE
+            else if (msg.image) {
+                contentHtml = `<img src="${msg.image}" class="rounded-lg max-w-[200px] border border-black/10">`;
+            } 
+            // 3. TEXT MESSAGE
+            else {
+                contentHtml = msg.text ? msg.text.replace(/</g, "&lt;") : "";
+            }
 
             div.innerHTML = `
-                <span class="text-[10px] text-gray-400 mx-1 mb-0.5 ${isMe ? 'hidden' : 'block'}">${user}</span>
-                <div class="${isMe ? 'msg-self' : 'msg-other'} max-w-[85%] px-4 py-2.5 rounded-2xl text-[15px] shadow-sm break-words leading-relaxed">
-                    ${safeText}
+                <span class="text-[10px] text-gray-500 dark:text-gray-400 mx-1 mb-0.5 ${isMe ? 'hidden' : 'block'}">${msg.user}</span>
+                <div class="${isMe ? 'msg-self' : 'msg-other'} max-w-[85%] px-4 py-2 rounded-2xl text-[15px] shadow-sm break-words relative pb-5 min-w-[60px]">
+                    ${contentHtml}
+                    <span class="text-[9px] opacity-70 absolute bottom-1 right-2 ${isMe ? 'text-blue-100' : 'text-gray-400'}">${timeString}</span>
                 </div>
             `;
             container.appendChild(div);
@@ -248,7 +310,7 @@
             const t = document.getElementById('toast');
             document.getElementById('toast-msg').innerText = msg;
             t.classList.remove('opacity-0');
-            setTimeout(() => { t.classList.add('opacity-0'); }, 2500);
+            setTimeout(() => { t.classList.add('opacity-0'); }, 2000);
         }
     </script>
 </body>
